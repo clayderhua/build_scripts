@@ -7,7 +7,7 @@ VER_PREFIX="nvidia"
 echo "[ADV] DATE = ${DATE}"
 echo "[ADV] STORED = ${STORED}"
 echo "[ADV] BSP_URL = ${BSP_URL}"
-echo "[ADV] BSP_BRANCH = ${BSP_BRANCH}"
+#echo "[ADV] BSP_BRANCH = ${BSP_BRANCH}"
 echo "[ADV] BSP_XML = ${BSP_XML}"
 echo "[ADV] RELEASE_VERSION = ${RELEASE_VERSION}"
 echo "[ADV] MACHINE_LIST= ${MACHINE_LIST}"
@@ -192,7 +192,7 @@ function set_environment()
 {
     echo "[ADV] set environment"
     cd $CURR_PATH/$ROOT_DIR
-
+    sudo ln -s /usr/bin/python3 /usr/bin/python
 }
 
 function build_android_images()
