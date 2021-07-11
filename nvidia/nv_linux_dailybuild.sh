@@ -12,7 +12,7 @@ echo "[ADV] BSP_XML = ${BSP_XML}"
 echo "[ADV] RELEASE_VERSION = ${RELEASE_VERSION}"
 echo "[ADV] MACHINE_LIST= ${MACHINE_LIST}"
 echo "[ADV] BUILD_NUMBER = ${BUILD_NUMBER}"
-VER_TAG="${VER_PREFIX}AB"$(echo $RELEASE_VERSION | sed 's/[.]//')
+VER_TAG="${VER_PREFIX}LBV"$(echo $RELEASE_VERSION | sed 's/[.]//')
 echo "[ADV] VER_TAG = $VER_TAG"
 CURR_PATH="$PWD"
 ROOT_DIR="${VER_PREFIX}AB${RELEASE_VERSION}"_"$DATE"
@@ -43,11 +43,11 @@ function get_source_code()
     git clone https://github.com/rockchip-linux/repo.git
     mkdir $ROOT_DIR
     cd $ROOT_DIR
-
+    sudo chmod a+x ../repo
     ../repo/repo init -u $BSP_URL
     ../repo/repo sync
 
-	../bin/repo forall -c git lfs pull
+	../repo/repo forall -c git lfs pull
     cd $CURR_PATH
 }
 function generate_md5()
@@ -194,6 +194,7 @@ function set_environment()
 {
     echo "[ADV] set environment"
     cd $CURR_PATH/$ROOT_DIR
+    sudo rm -rf /usr/bin/python
     sudo ln -s /usr/bin/python3 /usr/bin/python
 }
 
