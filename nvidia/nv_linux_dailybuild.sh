@@ -12,6 +12,8 @@ echo "[ADV] BSP_XML = ${BSP_XML}"
 echo "[ADV] RELEASE_VERSION = ${RELEASE_VERSION}"
 echo "[ADV] MACHINE_LIST= ${MACHINE_LIST}"
 echo "[ADV] BUILD_NUMBER = ${BUILD_NUMBER}"
+VER_TAG="${VER_PREFIX}AB"$(echo $RELEASE_VERSION | sed 's/[.]//')
+echo "[ADV] VER_TAG = $VER_TAG"
 CURR_PATH="$PWD"
 ROOT_DIR="${VER_PREFIX}AB${RELEASE_VERSION}"_"$DATE"
 OUTPUT_DIR="$CURR_PATH/$STORED/$DATE"
@@ -279,7 +281,7 @@ function copy_image_to_storage()
 #  Main procedure 
 # ================
 #if [ "$PRODUCT" == "$VER_PREFIX" ]; then
-    mkdir $ROOT_DIR
+    sudo mkdir $ROOT_DIR
     get_source_code
 
 
