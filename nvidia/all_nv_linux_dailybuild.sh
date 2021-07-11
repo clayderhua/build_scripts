@@ -1,7 +1,7 @@
 #!/bin/bash
 MACHINE_LIST=""
 #rk_BSP
-./rk_android_N7_dailybuild.sh rk $VERSION_NUM
+./nv_linux_dailybuild.sh air020 $VERSION_NUM
 
 #DS100_projects
 if [ "$AIR020" == "true" ]; then
