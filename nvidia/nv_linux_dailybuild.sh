@@ -15,7 +15,7 @@ echo "[ADV] BUILD_NUMBER = ${BUILD_NUMBER}"
 VER_TAG="${VER_PREFIX}LBV"$(echo $RELEASE_VERSION | sed 's/[.]//')
 echo "[ADV] VER_TAG = $VER_TAG"
 CURR_PATH="$PWD"
-ROOT_DIR="${VER_PREFIX}AB${RELEASE_VERSION}"_"$DATE"
+ROOT_DIR="${VER_PREFIX}LBV${RELEASE_VERSION}"_"$DATE"
 OUTPUT_DIR="$CURR_PATH/$STORED/$DATE"
 
 
@@ -44,10 +44,10 @@ function get_source_code()
     mkdir $ROOT_DIR
     cd $ROOT_DIR
     sudo chmod a+x ../repo
-    ../repo/repo init -u $BSP_URL
-    ../repo/repo sync
+    sudo ../repo/repo init -u $BSP_URL
+    sudo ../repo/repo sync
 
-	../repo/repo forall -c git lfs pull
+	sudo ../repo/repo forall -c git lfs pull
     cd $CURR_PATH
 }
 function generate_md5()
