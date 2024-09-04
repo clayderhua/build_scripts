@@ -64,9 +64,14 @@ function define_cpu_type()
         CPU_TYPE=`expr $1 : '.*-\(.*\)$'`
         case $CPU_TYPE in
                 "6q")
-                        UBOOT_CPU_TYPE="mx6q"
+                        PRODUCT=`expr $1 : '\(.*\).*-'`
                         KERNEL_CPU_TYPE="imx6q"
-                        CPU_TYPE="DualQuad"
+                        CPU_TYPE="iMX6q"
+                        ;;
+                "6dl")
+                        PRODUCT=`expr $1 : '\(.*\).*-'`
+                        KERNEL_CPU_TYPE="imx6dl"
+                        CPU_TYPE="iMX6dl"
                         ;;
                 *)
                         # Do nothing
@@ -476,23 +481,23 @@ else #"$PRODUCT" != "$VER_PREFIX"
 
 		echo "[ADV] generate normal image"
 		DEPLOY_IMAGE_PATH="$CURR_PATH/$ROOT_DIR/$BUILDALL_DIR/$TMP_DIR/deploy/images/${KERNEL_CPU_TYPE}${PRODUCT}"
-		IMAGE_DIR="$OFFICIAL_VER"_"$CPU_TYPE"_"$MEMORY"_"$DATE"
+		IMAGE_DIR="$OFFICIAL_VER"_"$CPU_TYPE"_"$DATE"
 		prepare_images normal $IMAGE_DIR
 		copy_image_to_storage normal
 
 		echo "[ADV] create flash tool"
-		FLASH_DIR="$OFFICIAL_VER"_"$CPU_TYPE"_"$MEMORY"_flash_tool
+		FLASH_DIR="$OFFICIAL_VER"_"$CPU_TYPE"_flash_tool
 		prepare_images flash $FLASH_DIR
 		copy_image_to_storage flash
 
 		echo "[ADV] create individually script tool "
-		INDIVIDUAL_DIR="$OFFICIAL_VER"_"$CPU_TYPE"_"$MEMORY"_individually_script_tool
+		INDIVIDUAL_DIR="$OFFICIAL_VER"_"$CPU_TYPE"_individually_script_tool
 		prepare_images individually $INDIVIDUAL_DIR
 		copy_image_to_storage individually
 
 		echo "[ADV] create imx-boot files"
 		DEPLOY_IMX_BOOT_PATH="$CURR_PATH/$ROOT_DIR/$BUILDALL_DIR/$TMP_DIR/work/${KERNEL_CPU_TYPE}${PRODUCT}-poky-linux/imx-boot/*/git"
-		IMX_BOOT_DIR="$OFFICIAL_VER"_"$CPU_TYPE"_"$MEMORY"_imx-boot
+		IMX_BOOT_DIR="$OFFICIAL_VER"_"$CPU_TYPE"_imx-boot
 		prepare_images imx-boot $IMX_BOOT_DIR
 		copy_image_to_storage imx-boot
 
@@ -502,7 +507,7 @@ else #"$PRODUCT" != "$VER_PREFIX"
 
 		echo "[ADV] create misc files"
 		DEPLOY_MISC_PATH="$CURR_PATH/$ROOT_DIR/$BUILDALL_DIR/$TMP_DIR/deploy/images/${KERNEL_CPU_TYPE}${PRODUCT}"
-		MISC_DIR="$OFFICIAL_VER"_"$CPU_TYPE"_"$MEMORY"_misc
+		MISC_DIR="$OFFICIAL_VER"_"$CPU_TYPE"_misc
 		prepare_images misc $MISC_DIR
 		copy_image_to_storage misc
 
