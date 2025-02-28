@@ -241,6 +241,8 @@ function set_environment()
 	else
 		# First build
 		EULA=1 DISTRO=$BACKEND_TYPE MACHINE=${KERNEL_CPU_TYPE}${PRODUCT} UBOOT_CONFIG=${PRE_MEMORY} source imx-setup-release.sh -b $BUILDALL_DIR
+        echo 'BB_NUMBER_THREADS = "16"' >> conf/local.conf
+        echo 'PARALLEL_MAKE = "-j 4"' >> conf/local.conf
 	fi
 }
 
@@ -249,8 +251,8 @@ function clean_yocto_packages()
         echo "[ADV] build_yocto_image: clean for virtual_libg2d"
         PACKAGE_LIST=" \
 		gstreamer1.0-rtsp-server gst-examples freerdp \
-		imx-gpu-apitrace gstreamer1.0-plugins-good gstreamer1.0-plugins-base \
-		gstreamer1.0-plugins-bad imx-gpu-sdk opencv imx-gst1.0-plugin \
+		gstreamer1.0-plugins-good gstreamer1.0-plugins-base \
+		gstreamer1.0-plugins-bad kmscube opencv imx-gst1.0-plugin \
 		weston "
         for PACKAGE in ${PACKAGE_LIST}
         do
@@ -271,9 +273,6 @@ function clean_yocto_packages()
 	echo "[ADV] build_yocto_image: clean for other packages"
 	building spirv-tools cleansstate
 	building fmt cleansstate
-	if [ "$PRODUCT" == "rom7720a1" ] || [ "$PRODUCT" == "rom5620a1" ] || [ "$PRODUCT" == "rom3620a1" ] || [ "$PRODUCT" == "rom5722a1" ] || [ "$PRODUCT" == "rsb3720a2" ]; then
-                building nn-imx cleansstate
-        fi
 }
 
 function rebuild_bootloader()
@@ -286,7 +285,7 @@ function rebuild_bootloader()
 			echo "UBOOT_CONFIG = \"$BOOTLOADER_TYPE\"" >> $CURR_PATH/$ROOT_DIR/$BUILDALL_DIR/conf/local.conf
 			building imx-atf cleansstate
 			building optee-os cleansstate
-			building imx-boot clean
+			#building imx-boot clean
 			building $DEPLOY_IMAGE_NAME clean
 			building $DEPLOY_IMAGE_NAME 
 			;;
