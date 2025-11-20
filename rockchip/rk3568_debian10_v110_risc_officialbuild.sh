@@ -116,6 +116,7 @@ function create_xml_and_commit()
         cd $ROOT_DIR
         # add revision into xml
         ../repo/repo manifest -o $VER_TAG.xml -r
+        sed -i '/remote="advantech-azure-priv"/d' $VER_TAG.xml
         mv $VER_TAG.xml .repo/manifests
         cd .repo/manifests
 		git checkout $BSP_BRANCH
@@ -339,7 +340,7 @@ function building()
 		sudo dpkg -i ubuntu-build-service/packages/*
 		sudo apt-get install -f -y
 		cd $CURR_PATH/$ROOT_DIR/
-		sudo BUILD_IN_DOCKER=TRUE ./mk-debian.sh new >&1 | tee $CURR_PATH/$ROOT_DIR/$LOG_FILE_ROOTFS
+		sudo BUILD_IN_DOCKER=TRUE ./mk-debian.sh >&1 | tee $CURR_PATH/$ROOT_DIR/$LOG_FILE_ROOTFS
 
 		if [ -d "debian_$MODEL_NAME" ];then
 			cd $CURR_PATH/$ROOT_DIR/

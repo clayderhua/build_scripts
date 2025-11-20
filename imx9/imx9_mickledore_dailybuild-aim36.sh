@@ -195,10 +195,10 @@ function add_version()
 {
 	# Set U-boot version
 	sed -i "/UBOOT_LOCALVERSION/d" $ROOT_DIR/$U_BOOT_PATH
-	echo "UBOOT_LOCALVERSION = \"-$OFFICIAL_VER\"" >> $ROOT_DIR/$U_BOOT_PATH
+	echo "UBOOT_LOCALVERSION = \"-$(echo "$OFFICIAL_VER" | tr '[:upper:]' '[:lower:]')\"" >> $ROOT_DIR/$U_BOOT_PATH
 
 	# Set Linux version (replace)
-	sed -i "0,/LOCALVERSION/ s/LOCALVERSION = .*/LOCALVERSION = \"-$OFFICIAL_VER\"/g" $ROOT_DIR/$KERNEL_PATH
+	sed -i "0,/LOCALVERSION/ s/LOCALVERSION = .*/LOCALVERSION = \"-$(echo "$OFFICIAL_VER" | tr '[:upper:]' '[:lower:]')\"/g" $ROOT_DIR/$KERNEL_PATH
 }
 
 function building()
@@ -336,7 +336,7 @@ function prepare_images()
                 "misc")
                         cp $DEPLOY_MISC_PATH/${KERNEL_CPU_TYPE}*.dtb $OUTPUT_DIR
                         cp $DEPLOY_MISC_PATH/Image $OUTPUT_DIR
-                        cp $DEPLOY_MISC_PATH/imx-boot-imx8* $OUTPUT_DIR
+                        cp $DEPLOY_MISC_PATH/imx-boot-imx9* $OUTPUT_DIR
                         cp $DEPLOY_MISC_PATH/tee.bin $OUTPUT_DIR
                         cp -a $DEPLOY_MISC_PATH/imx-boot-tools $OUTPUT_DIR
                         ;;
@@ -348,7 +348,7 @@ function prepare_images()
                         sudo cp $CURR_PATH/mk_imx-boot.sh $OUTPUT_DIR
                         ;;
                 "modules")
-                        FILE_NAME="modules-imx8*.tgz"
+                        FILE_NAME="modules-imx9*.tgz"
                         cp $DEPLOY_MODULES_PATH/$FILE_NAME $OUTPUT_DIR
                         ;;
                 "normal")
@@ -423,7 +423,7 @@ function copy_image_to_storage()
 		;;
 		"normal")
 			generate_csv $IMAGE_DIR.img.gz
-			mv ${IMAGE_DIR}.img.csv $STORAGE_PATH/image
+			mv ${IMAGE_DIR}.img.csv $STORAGE_PATH
 			mv -f $IMAGE_DIR.img.gz $STORAGE_PATH/image
 		;;
 		*)
