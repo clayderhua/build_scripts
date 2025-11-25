@@ -85,7 +85,7 @@ function set_environment()
 
 function build_image()
 {
-	cd $CURR_PATH/$ROOT_DIR 2>&1 > /dev/null
+	#cd $CURR_PATH/$ROOT_DIR 2>&1 > /dev/null
 	echo "[ADV] check path ..."
 	ls -al
 	echo "[ADV] check current ..."
