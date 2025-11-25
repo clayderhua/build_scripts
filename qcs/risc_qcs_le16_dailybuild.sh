@@ -86,6 +86,12 @@ function set_environment()
 function build_image()
 {
 	cd $CURR_PATH/$ROOT_DIR 2>&1 > /dev/null
+	echo "[ADV] check path ..."
+	ls -al
+	echo "[ADV] check current ..."
+	pwd
+	echo "[ADV] check meta-advantech-qualcomm path ..."
+	ls -al ../layers/
 	echo "[ADV] building ..."
 	bitbake-layers add-layer ../layers/meta-advantech-qualcomm
 	bitbake qcom-multimedia-image
