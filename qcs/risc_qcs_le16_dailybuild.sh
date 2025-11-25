@@ -18,6 +18,8 @@ echo "[ADV] KERNEL_PATH = ${KERNEL_PATH}"
 echo "[ADV] YOCTO_MACHINE_NAME=$YOCTO_MACHINE_NAME"
 echo "[ADV] DISTRO_IMAGE = ${DISTRO_IMAGE}"
 echo "[ADV] SDK_TYPE = $SDK_TYPE"
+echo "[ADV] BUILD_TYPE = $BUILD_TYPE"
+
 
 
 CURR_PATH="$PWD"
@@ -80,21 +82,17 @@ function set_environment()
 {
 	cd $CURR_PATH/$ROOT_DIR 2>&1 > /dev/null
 	echo "[ADV] set environment"
-	MACHINE=qcs6490aom2721a1 DISTRO=qcom-wayland source setup-environment
+	MACHINE=qcs6490$PROJECT DISTRO=qcom-wayland source setup-environment
 }
 
 function build_image()
 {
 	#cd $CURR_PATH/$ROOT_DIR 2>&1 > /dev/null
-	echo "[ADV] check path ..."
-	ls -al
-	echo "[ADV] check current ..."
+	echo "[ADV] Check cuurent path"
 	pwd
-	echo "[ADV] check meta-advantech-qualcomm path ..."
-	ls -al ../layers/
 	echo "[ADV] building ..."
 	bitbake-layers add-layer ../layers/meta-advantech-qualcomm
-	bitbake qcom-multimedia-image
+	bitbake $BUILD_TYPE
 
 }
 
