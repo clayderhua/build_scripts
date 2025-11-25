@@ -225,6 +225,7 @@ fi
 get_source_code
 #update_oeminfo
 #get_downloads
+sudo apt install -y gcc g++ make bzip2 chrpath diffstat lz4
 set_environment
 build_image
 prepare_and_copy_images
