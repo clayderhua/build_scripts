@@ -82,7 +82,7 @@ function set_environment()
 {
 	cd $CURR_PATH/$ROOT_DIR 2>&1 > /dev/null
 	echo "[ADV] set environment"
-	MACHINE=qcs6490$PROJECT DISTRO=qcom-wayland source setup-environment
+	MACHINE=${YOCTO_MACHINE_NAME} DISTRO=qcom-wayland source setup-environment
 }
 
 function build_image()
@@ -157,7 +157,7 @@ function generate_csv()
 	HASH_BSP=$(cd .repo/manifests && git rev-parse HEAD)
 	HASH_DOWNLOAD=$(cd download && git rev-parse HEAD)
 	HASH_KERNEL=$(cd build-qcom-robotics-ros2-humble/tmp-glibc/work-shared/${YOCTO_MACHINE_NAME}/kernel-source && git rev-parse HEAD)
-	HASH_META_ADVANTECH=$(cd layers/meta-advantech && git rev-parse HEAD)
+	HASH_META_ADVANTECH=$(cd layers/meta-advantech-qualcomm && git rev-parse HEAD)
 	HASH_META_QCOM_EXTRAS=$(cd layers/meta-qcom-extras && git rev-parse HEAD)
 	HASH_META_QCOM_ROBOTICS_EXTRAS=$(cd layers/meta-qcom-robotics-extras && git rev-parse HEAD)
 	HASH_SCRIPTS=$(cd scripts && git rev-parse HEAD)
