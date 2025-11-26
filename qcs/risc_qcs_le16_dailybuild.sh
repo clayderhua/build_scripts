@@ -82,7 +82,15 @@ function set_environment()
 {
 	cd $CURR_PATH/$ROOT_DIR 2>&1 > /dev/null
 	echo "[ADV] set environment"
+
+	if [ "$SDK_TYPE" = "QIMP" ]; then
 	MACHINE=${YOCTO_MACHINE_NAME} DISTRO=qcom-wayland source setup-environment
+	elif [ "$SDK_TYPE" = "QIRP" ]; then
+	MACHINE=${YOCTO_MACHINE_NAME} DISTRO=qcom-robotics-ros2-humble QCOM_SELECTED_BSP=custom source setup-robotics-environment
+	else
+    echo "Error: Unknown SDK_TYPE ($SDK_TYPE)"
+    exit 1
+    fi
 }
 
 function build_image()
@@ -92,8 +100,15 @@ function build_image()
 	pwd
 	echo "[ADV] building ..."
 	bitbake-layers add-layer ../layers/meta-advantech-qualcomm
-	bitbake $BUILD_TYPE
 
+	if [ "$SDK_TYPE" = "QIMP" ]; then
+	bitbake $BUILD_TYPE
+	elif [ "$SDK_TYPE" = "QIRP" ]; then
+	../qirp-build qcom-robotics-full-image
+	else
+    echo "Error: Unknown SDK_TYPE ($SDK_TYPE)"
+    exit 1
+    fi
 }
 
 function generate_md5()
