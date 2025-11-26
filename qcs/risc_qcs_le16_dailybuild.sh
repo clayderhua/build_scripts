@@ -86,6 +86,9 @@ function set_environment()
 	if [ "$SDK_TYPE" = "QIMP" ]; then
 	MACHINE=${YOCTO_MACHINE_NAME} DISTRO=qcom-wayland source setup-environment
 	elif [ "$SDK_TYPE" = "QIRP" ]; then
+	pip3 install PyYAML
+	pip3 install requests
+    pip3 install tqdm gitpython
 	MACHINE=${YOCTO_MACHINE_NAME} DISTRO=qcom-robotics-ros2-humble QCOM_SELECTED_BSP=custom source setup-robotics-environment
 	else
     echo "Error: Unknown SDK_TYPE ($SDK_TYPE)"
