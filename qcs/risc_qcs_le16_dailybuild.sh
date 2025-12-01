@@ -89,6 +89,7 @@ function set_environment()
 	pip3 install PyYAML
 	pip3 install requests
     pip3 install tqdm gitpython
+    sudo apt-get install -y libgtest-dev
 	MACHINE=${YOCTO_MACHINE_NAME} DISTRO=qcom-robotics-ros2-humble QCOM_SELECTED_BSP=custom source setup-robotics-environment
 	else
     echo "Error: Unknown SDK_TYPE ($SDK_TYPE)"
