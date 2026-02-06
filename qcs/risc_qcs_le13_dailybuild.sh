@@ -18,9 +18,6 @@ echo "[ADV] KERNEL_PATH = ${KERNEL_PATH}"
 echo "[ADV] YOCTO_MACHINE_NAME=$YOCTO_MACHINE_NAME"
 echo "[ADV] DISTRO_IMAGE = ${DISTRO_IMAGE}"
 echo "[ADV] SDK_TYPE = $SDK_TYPE"
-echo "[ADV] BUILD_TYPE = $BUILD_TYPE"
-
-
 
 CURR_PATH="$PWD"
 ROOT_DIR="${PLATFORM_PREFIX}_${PROJECT}_v${RELEASE_VERSION}_${DATE}"
@@ -32,7 +29,7 @@ EMMC_IMAGE_VER="${PROJECT}_${OS_DISTRO}_v${RELEASE_VERSION}_${KERNEL_VERSION}_${
 if [ "$SDK_TYPE" = "QIMP" ]; then
     YOCTO_IMAGE_DIR="$CURR_PATH/$ROOT_DIR/build-qcom-wayland/tmp-glibc/deploy/images/${YOCTO_MACHINE_NAME}"
 elif [ "$SDK_TYPE" = "QIRP" ]; then
-    YOCTO_IMAGE_DIR="$CURR_PATH/$ROOT_DIR/build-qcom-robotics-ros2-humble/tmp-glibc/deploy/images/${YOCTO_MACHINE_NAME}"
+YOCTO_IMAGE_DIR="$CURR_PATH/$ROOT_DIR/build-qcom-robotics-ros2-humble/tmp-glibc/deploy/images/${YOCTO_MACHINE_NAME}"
 else
     echo "Error: Unknown SDK_TYPE ($SDK_TYPE)"
     exit 1
@@ -64,7 +61,7 @@ function update_oeminfo()
     echo "[INFO] Build_Date: $DATE"
     echo "[INFO] Image_Version: v${RELEASE_VERSION}"
 
-    #  Build_Date
+    # Build_Date
     sed -i "s/^Build_Date:.*/Build_Date: $DATE/" "$ini_file"
     # Image_Version
     sed -i "s/^Image_Version:.*/Dailybuild_Image_Version: V${RELEASE_VERSION}/" "$ini_file"
@@ -84,51 +81,30 @@ function set_environment()
 	echo "[ADV] set environment"
 
 	if [ "$SDK_TYPE" = "QIMP" ]; then
-	MACHINE=${YOCTO_MACHINE_NAME} DISTRO=qcom-wayland source setup-environment
+		MACHINE=${YOCTO_MACHINE_NAME} DISTRO=qcom-wayland source setup-environment
 	elif [ "$SDK_TYPE" = "QIRP" ]; then
-	pip3 install PyYAML
-	pip3 install requests
-	pip3 install tqdm gitpython
-	sudo apt-get install -y libgtest-dev
-	MACHINE=${YOCTO_MACHINE_NAME} DISTRO=qcom-robotics-ros2-humble QCOM_SELECTED_BSP=custom source setup-robotics-environment
+		MACHINE=${YOCTO_MACHINE_NAME} DISTRO=qcom-robotics-ros2-humble QCOM_SELECTED_BSP=custom source setup-robotics-environment
 	else
-    echo "Error: Unknown SDK_TYPE ($SDK_TYPE)"
-    exit 1
-    fi
+		echo "Error: Unknown SDK_TYPE ($SDK_TYPE)"
+		exit 1
+	fi
 }
 
 function build_image()
 {
-	#cd $CURR_PATH/$ROOT_DIR 2>&1 > /dev/null
 	echo "[ADV] Check cuurent path"
 	pwd
-	
-	echo "[ADV] Remove fail for le17"
-	rm -rf ../layers/meta-advantech-qualcomm/recipes-firmware/firmware/firmware-qcom-dspso_1.0.bbappend
-	rm -rf ../layers/meta-advantech-qualcomm/recipes-firmware/firmware/firmware-qcom-hlosfw_1.0.bbappend
-	
+
 	echo "[ADV] building ..."
-	bitbake-layers add-layer ../layers/meta-advantech-qualcomm
 
 	if [ "$SDK_TYPE" = "QIMP" ]; then
-	bitbake $BUILD_TYPE
+		bitbake qcom-multimedia-image
 	elif [ "$SDK_TYPE" = "QIRP" ]; then
-	echo "[ADV] building QIRP ..."
-
-	# Fixed the robotics issue and solution from Qcomm Ken.Lai
-	sed -i 's/ROS_BRANCH ?= "master"/ROS_BRANCH ?= "humble"/g' ../layers/meta-qcom-robotics/recipes/ranger-mini/ranger-mini-base_0.0.1.bb
-	sed -i 's/ROS_BRANCH ?= "master"/ROS_BRANCH ?= "humble"/g' ../layers/meta-qcom-robotics/recipes/ranger-mini/ranger-mini-bringup_0.0.1.bb
-	sed -i 's/ROS_BRANCH ?= "master"/ROS_BRANCH ?= "humble"/g' ../layers/meta-qcom-robotics/recipes/ranger-mini/ranger-mini-msg_0.0.1.bb	
-	#-------
-	# check
-	grep -inr "ROS_BRANCH" ../layers/meta-qcom-robotics/recipes/ranger-mini/ranger-mini-base_0.0.1.bb
-	grep -inr "ROS_BRANCH" ../layers/meta-qcom-robotics/recipes/ranger-mini/ranger-mini-bringup_0.0.1.bb
-	grep -inr "ROS_BRANCH" ../layers/meta-qcom-robotics/recipes/ranger-mini/ranger-mini-msg_0.0.1.bb
-	../qirp-build qcom-robotics-full-image
+		../qirp-build qcom-robotics-full-image
 	else
-    echo "Error: Unknown SDK_TYPE ($SDK_TYPE)"
-    exit 1
-    fi
+		echo "Error: Unknown SDK_TYPE ($SDK_TYPE)"
+		exit 1
+	fi
 }
 
 function generate_md5()
@@ -146,31 +122,30 @@ function prepare_and_copy_images()
 	echo "[ADV] creating ${UFS_IMAGE_VER}.tgz and ${EMMC_IMAGE_VER}.tgz..."
 
 	pushd $YOCTO_IMAGE_DIR 2>&1 > /dev/null
-if [ "$SDK_TYPE" = "QIMP" ]; then
-    mv qcom-multimedia-image ${UFS_IMAGE_VER}
-    mv qcom-multimedia-image-emmc ${EMMC_IMAGE_VER}
+	if [ "$SDK_TYPE" = "QIMP" ]; then
+		mv qcom-multimedia-image ${UFS_IMAGE_VER}
+		mv qcom-multimedia-image-emmc ${EMMC_IMAGE_VER}
+	
+	elif [ "$SDK_TYPE" = "QIRP" ]; then
+		mv qcom-robotics-full-image ${UFS_IMAGE_VER}
+        	mv qcom-robotics-full-image-emmc ${EMMC_IMAGE_VER}
 
-elif [ "$SDK_TYPE" = "QIRP" ]; then
-    mv qcom-robotics-full-image ${UFS_IMAGE_VER}
-    mv qcom-robotics-full-image-emmc ${EMMC_IMAGE_VER}
+	else
+		echo "Error: Unknown SDK_TYPE ($SDK_TYPE)"
+		popd
+		exit 1
+	fi
 
-else
-    echo "Error: Unknown SDK_TYPE ($SDK_TYPE)"
-    popd
-    exit 1
-fi
+	sudo tar czf ${UFS_IMAGE_VER}.tgz ${UFS_IMAGE_VER}
+	sudo tar czf ${EMMC_IMAGE_VER}.tgz ${EMMC_IMAGE_VER}
 
-# 打包 + MD5 + 移動輸出 (兩種 SDK_TYPE 都相同)
-sudo tar czf ${UFS_IMAGE_VER}.tgz ${UFS_IMAGE_VER}
-sudo tar czf ${EMMC_IMAGE_VER}.tgz ${EMMC_IMAGE_VER}
+	generate_md5 ${UFS_IMAGE_VER}.tgz
+	generate_md5 ${EMMC_IMAGE_VER}.tgz
 
-generate_md5 ${UFS_IMAGE_VER}.tgz
-generate_md5 ${EMMC_IMAGE_VER}.tgz
+	mv -f ${UFS_IMAGE_VER}.tgz* $OUTPUT_DIR
+	mv -f ${EMMC_IMAGE_VER}.tgz* $OUTPUT_DIR
 
-mv -f ${UFS_IMAGE_VER}.tgz* $OUTPUT_DIR
-mv -f ${EMMC_IMAGE_VER}.tgz* $OUTPUT_DIR
-
-popd
+	popd
 }
 
 function generate_csv()
@@ -188,14 +163,9 @@ function generate_csv()
 	
 	pushd $CURR_PATH/$ROOT_DIR 2>&1 > /dev/null
 
-	HASH_AMSS=$(cd amss && git rev-parse HEAD)
 	HASH_BSP=$(cd .repo/manifests && git rev-parse HEAD)
-	HASH_DOWNLOAD=$(cd download && git rev-parse HEAD)
 	HASH_KERNEL=$(cd build-qcom-robotics-ros2-humble/tmp-glibc/work-shared/${YOCTO_MACHINE_NAME}/kernel-source && git rev-parse HEAD)
-	HASH_META_ADVANTECH=$(cd layers/meta-advantech-qualcomm && git rev-parse HEAD)
-	HASH_META_QCOM_EXTRAS=$(cd layers/meta-qcom-extras && git rev-parse HEAD)
-	HASH_META_QCOM_ROBOTICS_EXTRAS=$(cd layers/meta-qcom-robotics-extras && git rev-parse HEAD)
-	HASH_SCRIPTS=$(cd scripts && git rev-parse HEAD)
+	HASH_META_ADVANTECH=$(cd layers/meta-advantech && git rev-parse HEAD)
 
 	cat > ${FILENAME}.csv << END_OF_CSV
 ESSD Software/OS Update News
@@ -212,13 +182,8 @@ Issue description, N/A
 Function Addition,
 Manifest, ${HASH_BSP}
 
-QCS_AMSS, ${HASH_AMSS}
-QCS_DOWNLOAD, ${HASH_DOWNLOAD}
 QCS_LINUX_QCOM, ${HASH_KERNEL}
 QCS_META_ADVANTECH, ${HASH_META_ADVANTECH}
-QCS_META_QCOM_EXTRAS, ${HASH_META_QCOM_EXTRAS}
-QCS_META_QCOM_ROBOTICS_EXTRAS, ${HASH_META_QCOM_ROBOTICS_EXTRAS}
-QCS_SCRIPTS, ${HASH_SCRIPTS}
 
 END_OF_CSV
 
@@ -262,9 +227,8 @@ fi
 
 #prepare source code and build environment
 get_source_code
-#update_oeminfo
-#get_downloads
-sudo apt install -y gcc g++ make bzip2 chrpath diffstat lz4
+update_oeminfo
+get_downloads
 set_environment
 build_image
 prepare_and_copy_images
@@ -273,3 +237,4 @@ prepare_and_copy_log
 
 cd $CURR_PATH
 echo "[ADV] build script done!"
+
