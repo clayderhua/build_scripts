@@ -265,7 +265,7 @@ function set_environment()
 	else
 		# First build
 		EULA=1 DISTRO=$BACKEND_TYPE MACHINE=${KERNEL_CPU_TYPE}${PRODUCT} UBOOT_CONFIG=${PRE_MEMORY} source imx-setup-release.sh -b $BUILDALL_DIR
-        echo 'BB_NUMBER_THREADS = "16"' >> conf/local.conf
+        echo "BB_NUMBER_THREADS = \"$(nproc)\"" >> conf/local.conf
         echo 'PARALLEL_MAKE = "-j 4"' >> conf/local.conf
 	fi
 }
@@ -488,7 +488,7 @@ function copy_image_to_storage()
 define_cpu_type $PRODUCT
 
 if [ "$PRODUCT" == "$VER_PREFIX" ]; then
-        mkdir $ROOT_DIR
+        mkdir -p $ROOT_DIR
         get_source_code
 
         # BSP source code
@@ -502,6 +502,12 @@ else #"$PRODUCT" != "$VER_PREFIX"
         if [ ! -e $ROOT_DIR ]; then
                 echo -e "No BSP is found!\nStop building." && exit 1
         fi
+
+	if [ -e $CURR_PATH/sstate-cache ]; then
+		echo "[ADV] link sstate-cache directory from backup"
+		mkdir -p $CURR_PATH/$ROOT_DIR/$BUILDALL_DIR
+		ln -s $CURR_PATH/sstate-cache $CURR_PATH/$ROOT_DIR/$BUILDALL_DIR/sstate-cache
+	fi
 
         if [ -e $CURR_PATH/downloads ] ; then
                 echo "[ADV] link downloads directory from backup"
